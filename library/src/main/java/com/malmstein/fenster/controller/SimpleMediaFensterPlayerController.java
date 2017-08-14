@@ -25,6 +25,8 @@ import com.malmstein.fenster.view.FensterTouchRoot;
 import java.util.Formatter;
 import java.util.Locale;
 
+import static android.R.attr.id;
+
 /**
  * Controller to manage syncing the ui models with the UI Controls and MediaPlayer.
  * <p/>
@@ -96,12 +98,13 @@ public final class SimpleMediaFensterPlayerController extends FrameLayout implem
 
     private void initControllerView() {
         mPauseButton = (ImageButton) findViewById(R.id.fen__media_controller_pause);
-        mPauseButton.requestFocus();
+        //mPauseButton.requestFocus();
         mPauseButton.setOnClickListener(mPauseListener);
 
         mNextButton = (ImageButton) findViewById(R.id.fen__media_controller_next);
+        mNextButton.setOnClickListener(mNextListener);
         mPrevButton = (ImageButton) findViewById(R.id.fen__media_controller_previous);
-
+        mPrevButton.setOnClickListener(mPreviousListener);
         mProgress = (SeekBar) findViewById(R.id.fen__media_controller_progress);
         SeekBar seeker = (SeekBar) mProgress;
         seeker.setOnSeekBarChangeListener(mSeekListener);
@@ -469,6 +472,32 @@ public final class SimpleMediaFensterPlayerController extends FrameLayout implem
     private final OnClickListener mPauseListener = new OnClickListener() {
         public void onClick(final View v) {
             doPauseResume();
+            show(DEFAULT_TIMEOUT);
+        }
+    };
+
+    private final View.OnClickListener mPreviousListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            int pos = mFensterPlayer.getCurrentPosition();
+            pos -= 5000; // milliseconds
+            if (pos >= 0) {
+                mFensterPlayer.seekTo(pos);
+                setProgress();
+            }
+            show(DEFAULT_TIMEOUT);
+        }
+    };
+
+    private final View.OnClickListener mNextListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            int pos = mFensterPlayer.getCurrentPosition();
+            pos += 15000; // milliseconds
+            if (pos <= mFensterPlayer.getDuration()) {
+                mFensterPlayer.seekTo(pos);
+                setProgress();
+            }
             show(DEFAULT_TIMEOUT);
         }
     };
