@@ -30,23 +30,7 @@ import com.malmstein.fenster.play.FensterVideoStateListener;
 import java.io.IOException;
 import java.util.Map;
 
-/**
- * Displays a video file.  The VideoView class
- * can load images from various sources (such as resources or content
- * providers), takes care of computing its measurement from the video so that
- * it can be used in any layout manager, and provides various display options
- * such as scaling and tinting.<p>
- * <p/>
- * <em>Note: VideoView does not retain its full state when going into the
- * background.</em>  In particular, it does not restore the current play state,
- * play position, selected tracks added via
- * {@link android.app.Activity#onSaveInstanceState} and
- * {@link android.app.Activity#onRestoreInstanceState}.<p>
- * Also note that the audio session id (from {@link #getAudioSessionId}) may
- * change from its previously returned value when the VideoView is restored.
- */
-
-public class FensterVideoView extends TextureView implements FensterPlayer {
+public class CopyFensterVideoView extends TextureView implements FensterPlayer {
 
     public static final String TAG = "TextureVideoView";
     public static final int VIDEO_BEGINNING = 0;
@@ -98,11 +82,11 @@ public class FensterVideoView extends TextureView implements FensterPlayer {
 
     private AlertDialog errorDialog;
 
-    public FensterVideoView(final Context context, final AttributeSet attrs) {
+    public CopyFensterVideoView(final Context context, final AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
-    public FensterVideoView(final Context context, final AttributeSet attrs, final int defStyle) {
+    public CopyFensterVideoView(final Context context, final AttributeSet attrs, final int defStyle) {
         super(context, attrs, defStyle);
         applyCustomAttributes(context, attrs);
         videoSizeCalculator = new VideoSizeCalculator();
@@ -130,24 +114,20 @@ public class FensterVideoView extends TextureView implements FensterPlayer {
 
     @Override
     protected void onMeasure(final int widthMeasureSpec, final int heightMeasureSpec) {
-        VideoSizeCalculator.Dimens dimens = videoSizeCalculator.measure(widthMeasureSpec, heightMeasureSpec);
+        VideoSizeCalculator.Dimens dimens = videoSizeCalculator.measure(widthMeasureSpec, heightMeasureSpec,true);
         setMeasuredDimension(dimens.getWidth(), dimens.getHeight());
     }
 
     @Override
     public void onInitializeAccessibilityEvent(final AccessibilityEvent event) {
         super.onInitializeAccessibilityEvent(event);
-        event.setClassName(FensterVideoView.class.getName());
+        event.setClassName(CopyFensterVideoView.class.getName());
     }
 
     @Override
     public void onInitializeAccessibilityNodeInfo(final AccessibilityNodeInfo info) {
         super.onInitializeAccessibilityNodeInfo(info);
-        info.setClassName(FensterVideoView.class.getName());
-    }
-
-    public int resolveAdjustedSize(final int desiredSize, final int measureSpec) {
-        return getDefaultSize(desiredSize, measureSpec);
+        info.setClassName(CopyFensterVideoView.class.getName());
     }
 
     private void initVideoView() {
@@ -162,6 +142,7 @@ public class FensterVideoView extends TextureView implements FensterPlayer {
         mTargetState = STATE_IDLE;
         setOnInfoListener(onInfoToPlayStateListener);
     }
+
 
     private void disableFileDescriptor() {
         mAssetFileDescriptor = null;

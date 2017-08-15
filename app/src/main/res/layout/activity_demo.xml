@@ -1,49 +1,56 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-  android:layout_width="match_parent"
-  android:layout_height="match_parent"
-  android:orientation="vertical"
-  android:padding="@dimen/activity_horizontal_margin">
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical"
+              android:padding="@dimen/activity_horizontal_margin">
 
-  <TextView
-    android:id="@+id/demo_activity_controller_description"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:gravity="center"
-    android:text="@string/description_demo_activity_controller" />
+    <TextView
+        android:id="@+id/demo_activity_controller_description"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="@string/description_demo_activity_controller"/>
 
-  <Button
-    android:id="@+id/start_simple_media_player_button"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_marginTop="@dimen/activity_vertical_margin"
-    android:text="@string/title_simple_media_player" />
+    <Button
+        android:id="@+id/start_simple_media_player_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/activity_vertical_margin"
+        android:text="@string/title_simple_media_player"/>
 
-  <Button
-    android:id="@+id/start_scale_media_player_button"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:text="@string/title_scale_media_player" />
+    <Button
+        android:id="@+id/start_scale_media_player_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/title_scale_media_player"/>
 
-  <Button
-    android:id="@+id/start_gesture_media_player_button"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:text="@string/title_gesture_media_player" />
+    <Button
+        android:id="@+id/start_gesture_media_player_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/title_gesture_media_player"/>
 
-  <TextView
-    android:id="@+id/demo_activity_origin_description"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_marginTop="@dimen/activity_vertical_margin"
-    android:gravity="center"
-    android:text="@string/description_demo_activity_origin" />
+    <TextView
+        android:id="@+id/demo_activity_origin_description"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/activity_vertical_margin"
+        android:gravity="center"
+        android:text="@string/description_demo_activity_origin"/>
 
-  <Button
-    android:id="@+id/local_file_media_player_button"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_marginTop="@dimen/activity_vertical_margin"
-    android:text="@string/title_local_media_player" />
+    <Button
+        android:id="@+id/local_file_media_player_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/activity_vertical_margin"
+        android:text="@string/title_local_media_player"/>
+
+    <Button
+        android:id="@+id/btn_test"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/activity_vertical_margin"
+        android:text="@string/test"/>
 
 </LinearLayout>

@@ -17,6 +17,7 @@ apply plugin: 'com.android.application'
 dependencies {
     compile project(":library")
 //    compile 'com.malmstein:fenster:0.0.1'
+    compile 'com.android.support:appcompat-v7:20.0.0'
 }
 
 android {
