@@ -9,32 +9,22 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.accessibility.AccessibilityEvent;
-import android.view.accessibility.AccessibilityNodeInfo;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.malmstein.fenster.R;
 import com.malmstein.fenster.play.FensterPlayer;
 import com.malmstein.fenster.play.FensterVideoStateListener;
-import com.malmstein.fenster.view.FensterTouchRoot;
 
 import java.util.Formatter;
 import java.util.Locale;
 
-/**
- * Controller to manage syncing the ui models with the UI Controls and MediaPlayer.
- * <p/>
- * Note that the ui models have a narrow scope (i.e. chapter list, piece navigation),
- * their interaction is orchestrated by this controller.ø
- * <p/>
- * It's actually a view currently, as is the android MediaController.
- * (which is a bit odd and should be subject to change.)
- */
-public final class SimpleMediaFensterPlayerController extends FrameLayout implements FensterPlayerController, FensterVideoStateListener, FensterTouchRoot.OnTouchReceiver {
+
+public final class CopySimpleMediaFensterPlayerController extends FrameLayout implements FensterPlayerController, FensterVideoStateListener {
 
     public static final String TAG = "PlayerController";
     public static final int DEFAULT_VIDEO_START = 0;
@@ -64,23 +54,19 @@ public final class SimpleMediaFensterPlayerController extends FrameLayout implem
     private ImageButton mPrevButton;
     private ProgressBar loadingView;
     private int lastPlayedSeconds = -1;
+    private boolean rootViewShowing = true;
+    private RelativeLayout rlControllerView;
 
-    public SimpleMediaFensterPlayerController(final Context context) {
+    public CopySimpleMediaFensterPlayerController(final Context context) {
         this(context, null);
     }
 
-    public SimpleMediaFensterPlayerController(final Context context, final AttributeSet attrs) {
+    public CopySimpleMediaFensterPlayerController(final Context context, final AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
-    public SimpleMediaFensterPlayerController(final Context context, final AttributeSet attrs, final int defStyle) {
+    public CopySimpleMediaFensterPlayerController(final Context context, final AttributeSet attrs, final int defStyle) {
         super(context, attrs, defStyle);
-    }
-
-    @Override
-    protected void onFinishInflate() {
-        super.onFinishInflate();
-        LayoutInflater.from(getContext()).inflate(R.layout.fen__view_simple_media_controller, this);
         initControllerView();
     }
 
@@ -96,8 +82,24 @@ public final class SimpleMediaFensterPlayerController extends FrameLayout implem
     }
 
     private void initControllerView() {
+        LayoutInflater.from(getContext()).inflate(R.layout.copy_fen__view_simple_media_controller, this);
+        rlControllerView = (RelativeLayout) findViewById(R.id.rl_controller_view);
+        setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (rootViewShowing) {
+                    rootViewShowing = false;
+                    rlControllerView.setVisibility(INVISIBLE);
+                    hide();
+                } else {
+                    rootViewShowing = true;
+                    rlControllerView.setVisibility(VISIBLE);
+                    show(0);
+                }
+            }
+        });
         mPauseButton = (ImageButton) findViewById(R.id.fen__media_controller_pause);
-        //mPauseButton.requestFocus();
+        mPauseButton.requestFocus();
         mPauseButton.setOnClickListener(mPauseListener);
 
         mNextButton = (ImageButton) findViewById(R.id.fen__media_controller_next);
@@ -114,17 +116,14 @@ public final class SimpleMediaFensterPlayerController extends FrameLayout implem
         mFormatBuilder = new StringBuilder();
         mFormatter = new Formatter(mFormatBuilder, Locale.getDefault());
 
-        FensterTouchRoot touchRoot = (FensterTouchRoot) findViewById(R.id.media_controller_touch_root);
-        touchRoot.setOnTouchReceiver(this);
-
         bottomControlsRoot = findViewById(R.id.fen__media_controller_bottom_area);
-        bottomControlsRoot.setVisibility(View.INVISIBLE);
-
+        bottomControlsRoot.setVisibility(INVISIBLE);
         controlsRoot = findViewById(R.id.media_controller_controls_root);
-        controlsRoot.setVisibility(View.INVISIBLE);
+        controlsRoot.setVisibility(INVISIBLE);
 
         loadingView = (ProgressBar) findViewById(R.id.fen__media_controller_loading_view);
     }
+
 
     /**
      * Show the controller on screen. It will go away
@@ -132,6 +131,7 @@ public final class SimpleMediaFensterPlayerController extends FrameLayout implem
      */
     @Override
     public void show() {
+        Log.e(TAG, "show");
         show(DEFAULT_TIMEOUT);
     }
 
@@ -144,32 +144,7 @@ public final class SimpleMediaFensterPlayerController extends FrameLayout implem
      */
     @Override
     public void show(final int timeInMilliSeconds) {
-        if (!mShowing) {
-            setProgress();
-            if (mPauseButton != null) {
-                mPauseButton.requestFocus();
-            }
-            mShowing = true;
-            setVisibility(View.VISIBLE);
-        }
-
-        updatePausePlay();
-
-        // cause the progress bar to be updated even if mShowing
-        // was already true.  This happens, for example, if we're
-        // paused with the progress bar showing the user hits play.
-        mHandler.sendEmptyMessage(SHOW_PROGRESS);
-
-        Message msg = mHandler.obtainMessage(FADE_OUT);
-        if (timeInMilliSeconds != 0) {
-            mHandler.removeMessages(FADE_OUT);
-            mHandler.sendMessageDelayed(msg, timeInMilliSeconds);
-        }
-
-        if (visibilityListener != null) {
-            visibilityListener.onControlsVisibilityChange(true);
-        }
-
+        Log.e(TAG, "show");
     }
 
     public boolean isShowing() {
@@ -189,19 +164,7 @@ public final class SimpleMediaFensterPlayerController extends FrameLayout implem
      */
     @Override
     public void hide() {
-
-        if (mShowing) {
-            try {
-                mHandler.removeMessages(SHOW_PROGRESS);
-                setVisibility(View.INVISIBLE);
-            } catch (final IllegalArgumentException ex) {
-                Log.w("MediaController", "already removed");
-            }
-            mShowing = false;
-        }
-        if (visibilityListener != null) {
-            visibilityListener.onControlsVisibilityChange(false);
-        }
+        Log.e(TAG, "hide");
     }
 
     private String stringForTime(final int timeMs) {
@@ -324,41 +287,12 @@ public final class SimpleMediaFensterPlayerController extends FrameLayout implem
     }
 
     @Override
-    public void setEnabled(final boolean enabled) {
-
-        if (mPauseButton != null) {
-            mPauseButton.setEnabled(enabled);
-        }
-
-        if (mNextButton != null) {
-            mNextButton.setEnabled(enabled);
-        }
-        if (mPrevButton != null) {
-            mPrevButton.setEnabled(enabled);
-        }
-        if (mProgress != null) {
-            mProgress.setEnabled(enabled);
-        }
-        super.setEnabled(enabled);
-    }
-
-    @Override
-    public void onInitializeAccessibilityEvent(final AccessibilityEvent event) {
-        super.onInitializeAccessibilityEvent(event);
-        event.setClassName(SimpleMediaFensterPlayerController.class.getName());
-    }
-
-    @Override
-    public void onInitializeAccessibilityNodeInfo(final AccessibilityNodeInfo info) {
-        super.onInitializeAccessibilityNodeInfo(info);
-        info.setClassName(SimpleMediaFensterPlayerController.class.getName());
-    }
-
-    @Override
     public void onFirstVideoFrameRendered() {
-        controlsRoot.setVisibility(View.VISIBLE);
-        bottomControlsRoot.setVisibility(View.VISIBLE);
+        Log.e(TAG, "onFirstVideoFrameRendered");
         mFirstTimeLoading = false;
+        bottomControlsRoot.setVisibility(VISIBLE);
+        controlsRoot.setVisibility(VISIBLE);
+        mHandler.sendEmptyMessage(SHOW_PROGRESS);
     }
 
     @Override
@@ -377,7 +311,7 @@ public final class SimpleMediaFensterPlayerController extends FrameLayout implem
     }
 
     private void hideLoadingView() {
-        hide();
+        //hide();
         loadingView.setVisibility(View.GONE);
 
         mLoading = false;
@@ -474,7 +408,7 @@ public final class SimpleMediaFensterPlayerController extends FrameLayout implem
         }
     };
 
-    private final View.OnClickListener mPreviousListener = new View.OnClickListener() {
+    private final OnClickListener mPreviousListener = new OnClickListener() {
         @Override
         public void onClick(View v) {
             int pos = mFensterPlayer.getCurrentPosition();
@@ -487,7 +421,7 @@ public final class SimpleMediaFensterPlayerController extends FrameLayout implem
         }
     };
 
-    private final View.OnClickListener mNextListener = new View.OnClickListener() {
+    private final OnClickListener mNextListener = new OnClickListener() {
         @Override
         public void onClick(View v) {
             int pos = mFensterPlayer.getCurrentPosition();
@@ -499,18 +433,5 @@ public final class SimpleMediaFensterPlayerController extends FrameLayout implem
             show(DEFAULT_TIMEOUT);
         }
     };
-
-    /**
-     * Called by ViewTouchRoot on user touches,
-     * so we can avoid hiding the ui while the user is interacting.
-     */
-    @Override
-    public void onControllerUiTouched() {
-        Log.e(TAG,"onControllerUiTouched");
-        if (mShowing) {
-            Log.d(TAG, "controller ui touch received!");
-            show();
-        }
-    }
 
 }

@@ -6,9 +6,7 @@
 
   </style>
 
-  <style name="FensterFullscreenTheme" parent="android:Theme.Holo">
-    <item name="android:actionBarStyle">@style/FensterFullscreenActionBarStyle</item>
-    <item name="android:windowActionBarOverlay">true</item>
+  <style name="FensterFullscreenTheme" parent="android:Theme.Holo.NoActionBar">
     <item name="android:windowBackground">@null</item>
     <item name="metaButtonBarStyle">?android:attr/buttonBarStyle</item>
     <item name="metaButtonBarButtonStyle">?android:attr/buttonBarButtonStyle</item>

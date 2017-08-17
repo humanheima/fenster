@@ -88,7 +88,7 @@ public class VideoSizeCalculator {
         return dimens;
     }
 
-    protected Dimens measure(int widthMeasureSpec, int heightMeasureSpec,boolean matchMidth) {
+    protected Dimens measure(int widthMeasureSpec, int heightMeasureSpec,boolean matchWidth) {
         int width = View.getDefaultSize(mVideoWidth, widthMeasureSpec);
         int height = View.getDefaultSize(mVideoHeight, heightMeasureSpec);
         if (hasASizeYet()) {

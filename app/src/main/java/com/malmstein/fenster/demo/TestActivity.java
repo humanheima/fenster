@@ -5,30 +5,24 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.widget.RelativeLayout;
 
-import com.malmstein.fenster.controller.FensterPlayerControllerVisibilityListener;
-import com.malmstein.fenster.controller.SimpleMediaFensterPlayerController;
+import com.malmstein.fenster.controller.CopySimpleMediaFensterPlayerController;
 import com.malmstein.fenster.helper.ScreenResolution;
 import com.malmstein.fenster.view.CopyFensterVideoView;
 
-public class TestActivity extends Activity implements FensterPlayerControllerVisibilityListener {
+public class TestActivity extends Activity  {
 
     private static final String TAG = "TestActivity";
 
     private CopyFensterVideoView textureView;
-    private SimpleMediaFensterPlayerController fullScreenMediaPlayerController;
+    private CopySimpleMediaFensterPlayerController fullScreenMediaPlayerController;
     private RelativeLayout rlVideoView;
     private int portraitWidth;
     private boolean isLandscape;
-
-    @Override
-    public void onControlsVisibilityChange(boolean value) {
-        setSystemUiVisibility(value);
-    }
 
     public static void launch(Context context) {
         Intent starter = new Intent(context, TestActivity.class);
@@ -43,6 +37,21 @@ public class TestActivity extends Activity implements FensterPlayerControllerVis
         initVideo();
     }
 
+    private void bindViews() {
+        rlVideoView = (RelativeLayout) findViewById(R.id.rl_video_view);
+        textureView = (CopyFensterVideoView) findViewById(R.id.play_video_texture);
+        fullScreenMediaPlayerController = (CopySimpleMediaFensterPlayerController) findViewById(R.id.play_video_controller);
+        setPortrait();
+    }
+
+    private void initVideo() {
+        textureView.setMediaController(fullScreenMediaPlayerController);
+        textureView.setOnInfoListener(onInfoToPlayStateListener);
+        textureView.setOnPlayStateListener(fullScreenMediaPlayerController);
+        textureView.setVideo("http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4");
+        textureView.start();
+    }
+
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
@@ -55,22 +64,6 @@ public class TestActivity extends Activity implements FensterPlayerControllerVis
             isLandscape = false;
             setPortrait();
         }
-    }
-
-    @Override
-    public void onBackPressed() {
-        if (isLandscape) {
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-            setFullSensor();
-        } else {
-            super.onBackPressed();
-        }
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        textureView.stopPlayback();
     }
 
     private void setPortrait() {
@@ -108,41 +101,42 @@ public class TestActivity extends Activity implements FensterPlayerControllerVis
         }, 2000);
     }
 
-    private void bindViews() {
-        rlVideoView = (RelativeLayout) findViewById(R.id.rl_video_view);
-        textureView = (CopyFensterVideoView) findViewById(R.id.play_video_texture);
-        fullScreenMediaPlayerController = (SimpleMediaFensterPlayerController) findViewById(R.id.play_video_controller);
-        setPortrait();
-    }
-
-    private void initVideo() {
-        fullScreenMediaPlayerController.setVisibilityListener(this);
-        textureView.setMediaController(fullScreenMediaPlayerController);
-        textureView.setOnPlayStateListener(fullScreenMediaPlayerController);
-        textureView.setVideo("http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4");
-        textureView.start();
-    }
-
-    private void setSystemUiVisibility(final boolean visible) {
-        int newVis = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION;
-
-        if (!visible) {
-            newVis |= View.SYSTEM_UI_FLAG_LOW_PROFILE
-                    | View.SYSTEM_UI_FLAG_FULLSCREEN
-                    | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
+    @Override
+    public void onBackPressed() {
+        if (isLandscape) {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+            setFullSensor();
+        } else {
+            super.onBackPressed();
         }
-
-        final View decorView = getWindow().getDecorView();
-        decorView.setSystemUiVisibility(newVis);
-        decorView.setOnSystemUiVisibilityChangeListener(new View.OnSystemUiVisibilityChangeListener() {
-            @Override
-            public void onSystemUiVisibilityChange(final int visibility) {
-                if ((visibility & View.SYSTEM_UI_FLAG_LOW_PROFILE) == 0) {
-                    fullScreenMediaPlayerController.show();
-                }
-            }
-        });
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        textureView.stopPlayback();
+    }
+
+    private MediaPlayer.OnInfoListener onInfoToPlayStateListener = new MediaPlayer.OnInfoListener() {
+
+        @Override
+        public boolean onInfo(final MediaPlayer mp, final int what, final int extra) {
+            Log.e(TAG, "onInfo what=" + what);
+          /*  if (textureView == null || fullScreenMediaPlayerController == null) {
+                return false;
+            }*/
+            if (MediaPlayer.MEDIA_INFO_VIDEO_RENDERING_START == what) {
+                fullScreenMediaPlayerController.onFirstVideoFrameRendered();
+                fullScreenMediaPlayerController.onPlay();
+            }
+            if (MediaPlayer.MEDIA_INFO_BUFFERING_START == what) {
+                fullScreenMediaPlayerController.onBuffer();
+            }
+            if (MediaPlayer.MEDIA_INFO_BUFFERING_END == what) {
+                fullScreenMediaPlayerController.onPlay();
+            }
+            return false;
+        }
+    };
+
 }

@@ -3,7 +3,7 @@
                 xmlns:tools="http://schemas.android.com/tools"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@color/default_bg"
+                android:background="@android:color/white"
                 tools:context=".SimpleMediaPlayerActivity">
 
     <RelativeLayout
@@ -17,11 +17,12 @@
             android:layout_height="match_parent"
             android:keepScreenOn="true"/>
 
-        <com.malmstein.fenster.controller.SimpleMediaFensterPlayerController
+        <com.malmstein.fenster.controller.CopySimpleMediaFensterPlayerController
             android:id="@+id/play_video_controller"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
+
             android:animateLayoutChanges="true"/>
 
     </RelativeLayout>

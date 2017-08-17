@@ -140,7 +140,6 @@ public class CopyFensterVideoView extends TextureView implements FensterPlayer {
         requestFocus();
         mCurrentState = STATE_IDLE;
         mTargetState = STATE_IDLE;
-        setOnInfoListener(onInfoToPlayStateListener);
     }
 
 
@@ -522,7 +521,7 @@ public class CopyFensterVideoView extends TextureView implements FensterPlayer {
      *
      * @param l The callback that will be run
      */
-    private void setOnInfoListener(final OnInfoListener l) {
+    public void setOnInfoListener(final OnInfoListener l) {
         mOnInfoListener = l;
     }
 
@@ -547,6 +546,7 @@ public class CopyFensterVideoView extends TextureView implements FensterPlayer {
 
         @Override
         public boolean onSurfaceTextureDestroyed(final SurfaceTexture surface) {
+            Log.e(TAG,"onSurfaceTextureDestroyed");
             mSurfaceTexture = null;
             hideMediaController();
             release(true);
@@ -740,7 +740,7 @@ public class CopyFensterVideoView extends TextureView implements FensterPlayer {
         return mAudioSession;
     }
 
-    private final OnInfoListener onInfoToPlayStateListener = new OnInfoListener() {
+    /*private final OnInfoListener onInfoToPlayStateListener = new OnInfoListener() {
 
         @Override
         public boolean onInfo(final MediaPlayer mp, final int what, final int extra) {
@@ -761,7 +761,7 @@ public class CopyFensterVideoView extends TextureView implements FensterPlayer {
 
             return false;
         }
-    };
+    };*/
 
     private boolean noPlayStateListener() {
         return !hasPlayStateListener();
