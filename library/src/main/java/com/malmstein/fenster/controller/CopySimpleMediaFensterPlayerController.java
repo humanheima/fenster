@@ -26,7 +26,7 @@ import java.util.Locale;
 
 public final class CopySimpleMediaFensterPlayerController extends FrameLayout implements FensterPlayerController, FensterVideoStateListener {
 
-    public static final String TAG = "PlayerController";
+    public static final String TAG = "CopyPlayerController";
     public static final int DEFAULT_VIDEO_START = 0;
     private static final int DEFAULT_TIMEOUT = 5000;
 
@@ -39,7 +39,6 @@ public final class CopySimpleMediaFensterPlayerController extends FrameLayout im
     private boolean mDragging;
 
     private boolean mLoading;
-    private boolean mFirstTimeLoading = true;
 
     private StringBuilder mFormatBuilder;
     private Formatter mFormatter;
@@ -87,14 +86,10 @@ public final class CopySimpleMediaFensterPlayerController extends FrameLayout im
         setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (rootViewShowing) {
-                    rootViewShowing = false;
-                    rlControllerView.setVisibility(INVISIBLE);
+                if (mShowing) {
                     hide();
                 } else {
-                    rootViewShowing = true;
-                    rlControllerView.setVisibility(VISIBLE);
-                    show(0);
+                    show();
                 }
             }
         });
@@ -120,7 +115,6 @@ public final class CopySimpleMediaFensterPlayerController extends FrameLayout im
         bottomControlsRoot.setVisibility(INVISIBLE);
         controlsRoot = findViewById(R.id.media_controller_controls_root);
         controlsRoot.setVisibility(INVISIBLE);
-
         loadingView = (ProgressBar) findViewById(R.id.fen__media_controller_loading_view);
     }
 
@@ -145,6 +139,48 @@ public final class CopySimpleMediaFensterPlayerController extends FrameLayout im
     @Override
     public void show(final int timeInMilliSeconds) {
         Log.e(TAG, "show");
+        updatePausePlay();
+        if (timeInMilliSeconds != -1) {
+            if (!mShowing) {
+                mShowing = true;
+                setProgress();
+                if (mPauseButton != null) {
+                    mPauseButton.requestFocus();
+                }
+                if (rlControllerView.getVisibility() == INVISIBLE) {
+                    rlControllerView.setVisibility(VISIBLE);
+                }
+            }
+            // cause the progress bar to be updated even if mShowing
+            // was already true.  This happens, for example, if we're
+            // paused with the progress bar showing the user hits play.
+            mHandler.sendEmptyMessage(SHOW_PROGRESS);
+
+            Message msg = mHandler.obtainMessage(FADE_OUT);
+            if (timeInMilliSeconds != 0) {
+                mHandler.removeMessages(FADE_OUT);
+                mHandler.sendMessageDelayed(msg, timeInMilliSeconds);
+            }
+        } else {
+            //播放结束的时候显示conroller
+            mHandler.removeMessages(SHOW_PROGRESS);
+            rlControllerView.setVisibility(VISIBLE);
+        }
+    }
+
+    /**
+     * Remove the controller from the screen.
+     */
+    @Override
+    public void hide() {
+        Log.e(TAG, "hide");
+        if (mShowing) {
+            mShowing = false;
+            if (rlControllerView.getVisibility() == VISIBLE) {
+                rlControllerView.setVisibility(INVISIBLE);
+            }
+            updatePausePlay();
+        }
     }
 
     public boolean isShowing() {
@@ -155,17 +191,6 @@ public final class CopySimpleMediaFensterPlayerController extends FrameLayout im
         return mLoading;
     }
 
-    public boolean isFirstTimeLoading() {
-        return mFirstTimeLoading;
-    }
-
-    /**
-     * Remove the controller from the screen.
-     */
-    @Override
-    public void hide() {
-        Log.e(TAG, "hide");
-    }
 
     private String stringForTime(final int timeMs) {
         int totalSeconds = timeMs / 1000;
@@ -269,7 +294,6 @@ public final class CopySimpleMediaFensterPlayerController extends FrameLayout im
         if (mPauseButton == null) {
             return;
         }
-
         if (mFensterPlayer.isPlaying()) {
             mPauseButton.setImageResource(android.R.drawable.ic_media_pause);
         } else {
@@ -289,10 +313,8 @@ public final class CopySimpleMediaFensterPlayerController extends FrameLayout im
     @Override
     public void onFirstVideoFrameRendered() {
         Log.e(TAG, "onFirstVideoFrameRendered");
-        mFirstTimeLoading = false;
         bottomControlsRoot.setVisibility(VISIBLE);
         controlsRoot.setVisibility(VISIBLE);
-        mHandler.sendEmptyMessage(SHOW_PROGRESS);
     }
 
     @Override
@@ -364,7 +386,6 @@ public final class CopySimpleMediaFensterPlayerController extends FrameLayout im
 
         public void onStopTrackingTouch(final SeekBar bar) {
             mDragging = false;
-            setProgress();
             updatePausePlay();
             show(DEFAULT_TIMEOUT);
 
@@ -391,8 +412,9 @@ public final class CopySimpleMediaFensterPlayerController extends FrameLayout im
                     }
                     break;
                 case SHOW_PROGRESS:
+                    Log.e(TAG, "show progress");
                     pos = setProgress();
-                    if (!mDragging && mShowing && mFensterPlayer.isPlaying()) {
+                    if (!mDragging && mFensterPlayer.isPlaying()) {
                         final Message message = obtainMessage(SHOW_PROGRESS);
                         sendMessageDelayed(message, 1000 - (pos % 1000));
                     }

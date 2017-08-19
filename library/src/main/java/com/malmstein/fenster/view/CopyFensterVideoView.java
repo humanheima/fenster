@@ -114,7 +114,7 @@ public class CopyFensterVideoView extends TextureView implements FensterPlayer {
 
     @Override
     protected void onMeasure(final int widthMeasureSpec, final int heightMeasureSpec) {
-        VideoSizeCalculator.Dimens dimens = videoSizeCalculator.measure(widthMeasureSpec, heightMeasureSpec,true);
+        VideoSizeCalculator.Dimens dimens = videoSizeCalculator.measure(widthMeasureSpec, heightMeasureSpec, true);
         setMeasuredDimension(dimens.getWidth(), dimens.getHeight());
     }
 
@@ -352,7 +352,7 @@ public class CopyFensterVideoView extends TextureView implements FensterPlayer {
             setKeepScreenOn(false);
             mCurrentState = STATE_PLAYBACK_COMPLETED;
             mTargetState = STATE_PLAYBACK_COMPLETED;
-            hideMediaController();
+            showMediaController(true);
             if (mOnCompletionListener != null) {
                 mOnCompletionListener.onCompletion(mMediaPlayer);
             }
@@ -402,6 +402,12 @@ public class CopyFensterVideoView extends TextureView implements FensterPlayer {
     private void showMediaController() {
         if (fensterPlayerController != null) {
             fensterPlayerController.show();
+        }
+    }
+
+    private void showMediaController(boolean complete) {
+        if (fensterPlayerController != null) {
+            fensterPlayerController.show(-1);
         }
     }
 
@@ -546,7 +552,7 @@ public class CopyFensterVideoView extends TextureView implements FensterPlayer {
 
         @Override
         public boolean onSurfaceTextureDestroyed(final SurfaceTexture surface) {
-            Log.e(TAG,"onSurfaceTextureDestroyed");
+            Log.e(TAG, "onSurfaceTextureDestroyed");
             mSurfaceTexture = null;
             hideMediaController();
             release(true);

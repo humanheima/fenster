@@ -144,31 +144,7 @@ public final class SimpleMediaFensterPlayerController extends FrameLayout implem
      */
     @Override
     public void show(final int timeInMilliSeconds) {
-        if (!mShowing) {
-            setProgress();
-            if (mPauseButton != null) {
-                mPauseButton.requestFocus();
-            }
-            mShowing = true;
-            setVisibility(View.VISIBLE);
-        }
-
-        updatePausePlay();
-
-        // cause the progress bar to be updated even if mShowing
-        // was already true.  This happens, for example, if we're
-        // paused with the progress bar showing the user hits play.
-        mHandler.sendEmptyMessage(SHOW_PROGRESS);
-
-        Message msg = mHandler.obtainMessage(FADE_OUT);
-        if (timeInMilliSeconds != 0) {
-            mHandler.removeMessages(FADE_OUT);
-            mHandler.sendMessageDelayed(msg, timeInMilliSeconds);
-        }
-
-        if (visibilityListener != null) {
-            visibilityListener.onControlsVisibilityChange(true);
-        }
+        hide();
 
     }
 

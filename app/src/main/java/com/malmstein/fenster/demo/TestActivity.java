@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.content.res.AssetFileDescriptor;
 import android.content.res.Configuration;
 import android.media.MediaPlayer;
 import android.os.Bundle;
@@ -48,7 +49,9 @@ public class TestActivity extends Activity  {
         textureView.setMediaController(fullScreenMediaPlayerController);
         textureView.setOnInfoListener(onInfoToPlayStateListener);
         textureView.setOnPlayStateListener(fullScreenMediaPlayerController);
-        textureView.setVideo("http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4");
+       /* textureView.setVideo("http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4");*/
+        AssetFileDescriptor assetFileDescriptor = getResources().openRawResourceFd(R.raw.big_buck_bunny);
+        textureView.setVideo(assetFileDescriptor);
         textureView.start();
     }
 
@@ -122,9 +125,9 @@ public class TestActivity extends Activity  {
         @Override
         public boolean onInfo(final MediaPlayer mp, final int what, final int extra) {
             Log.e(TAG, "onInfo what=" + what);
-          /*  if (textureView == null || fullScreenMediaPlayerController == null) {
+            if (textureView == null || fullScreenMediaPlayerController == null) {
                 return false;
-            }*/
+            }
             if (MediaPlayer.MEDIA_INFO_VIDEO_RENDERING_START == what) {
                 fullScreenMediaPlayerController.onFirstVideoFrameRendered();
                 fullScreenMediaPlayerController.onPlay();
