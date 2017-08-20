@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.Configuration;
-import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.RelativeLayout;
@@ -15,7 +14,7 @@ import com.malmstein.fenster.controller.CopySimpleMediaFensterPlayerController;
 import com.malmstein.fenster.helper.ScreenResolution;
 import com.malmstein.fenster.view.CopyFensterVideoView;
 
-public class TestActivity extends Activity  {
+public class TestActivity extends Activity {
 
     private static final String TAG = "TestActivity";
 
@@ -24,6 +23,7 @@ public class TestActivity extends Activity  {
     private RelativeLayout rlVideoView;
     private int portraitWidth;
     private boolean isLandscape;
+    private int currentPosition;
 
     public static void launch(Context context) {
         Intent starter = new Intent(context, TestActivity.class);
@@ -47,12 +47,25 @@ public class TestActivity extends Activity  {
 
     private void initVideo() {
         textureView.setMediaController(fullScreenMediaPlayerController);
-        textureView.setOnInfoListener(onInfoToPlayStateListener);
+        //textureView.setOnInfoListener(onInfoToPlayStateListener);
         textureView.setOnPlayStateListener(fullScreenMediaPlayerController);
-       /* textureView.setVideo("http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4");*/
+        //textureView.setVideo("http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4");
         AssetFileDescriptor assetFileDescriptor = getResources().openRawResourceFd(R.raw.big_buck_bunny);
         textureView.setVideo(assetFileDescriptor);
         textureView.start();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        currentPosition = textureView.getCurrentPosition();
+        fullScreenMediaPlayerController.setVideoPlayPause(false);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        fullScreenMediaPlayerController.setVideoPlayPause(true, currentPosition);
     }
 
     @Override
@@ -117,29 +130,9 @@ public class TestActivity extends Activity  {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        textureView.stopPlayback();
-    }
-
-    private MediaPlayer.OnInfoListener onInfoToPlayStateListener = new MediaPlayer.OnInfoListener() {
-
-        @Override
-        public boolean onInfo(final MediaPlayer mp, final int what, final int extra) {
-            Log.e(TAG, "onInfo what=" + what);
-            if (textureView == null || fullScreenMediaPlayerController == null) {
-                return false;
-            }
-            if (MediaPlayer.MEDIA_INFO_VIDEO_RENDERING_START == what) {
-                fullScreenMediaPlayerController.onFirstVideoFrameRendered();
-                fullScreenMediaPlayerController.onPlay();
-            }
-            if (MediaPlayer.MEDIA_INFO_BUFFERING_START == what) {
-                fullScreenMediaPlayerController.onBuffer();
-            }
-            if (MediaPlayer.MEDIA_INFO_BUFFERING_END == what) {
-                fullScreenMediaPlayerController.onPlay();
-            }
-            return false;
+        if (textureView != null) {
+            textureView.stopPlayback();
         }
-    };
+    }
 
 }

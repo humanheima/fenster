@@ -19,8 +19,6 @@ import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.Surface;
 import android.view.TextureView;
-import android.view.accessibility.AccessibilityEvent;
-import android.view.accessibility.AccessibilityNodeInfo;
 
 import com.malmstein.fenster.R;
 import com.malmstein.fenster.controller.FensterPlayerController;
@@ -32,7 +30,7 @@ import java.util.Map;
 
 public class CopyFensterVideoView extends TextureView implements FensterPlayer {
 
-    public static final String TAG = "TextureVideoView";
+    private static final String TAG = "TextureVideoView";
     public static final int VIDEO_BEGINNING = 0;
 
     public enum ScaleType {
@@ -118,28 +116,15 @@ public class CopyFensterVideoView extends TextureView implements FensterPlayer {
         setMeasuredDimension(dimens.getWidth(), dimens.getHeight());
     }
 
-    @Override
-    public void onInitializeAccessibilityEvent(final AccessibilityEvent event) {
-        super.onInitializeAccessibilityEvent(event);
-        event.setClassName(CopyFensterVideoView.class.getName());
-    }
-
-    @Override
-    public void onInitializeAccessibilityNodeInfo(final AccessibilityNodeInfo info) {
-        super.onInitializeAccessibilityNodeInfo(info);
-        info.setClassName(CopyFensterVideoView.class.getName());
-    }
-
     private void initVideoView() {
         videoSizeCalculator.setVideoSize(0, 0);
-
         setSurfaceTextureListener(mSTListener);
-
         setFocusable(true);
         setFocusableInTouchMode(true);
         requestFocus();
         mCurrentState = STATE_IDLE;
         mTargetState = STATE_IDLE;
+        setOnInfoListener(onInfoToPlayStateListener);
     }
 
 
@@ -308,6 +293,7 @@ public class CopyFensterVideoView extends TextureView implements FensterPlayer {
         @Override
         public void onPrepared(final MediaPlayer mp) {
             mCurrentState = STATE_PREPARED;
+            //mTargetState = STATE_PLAYING;
 
             mCanPause = true;
             mCanSeekBack = true;
@@ -534,6 +520,7 @@ public class CopyFensterVideoView extends TextureView implements FensterPlayer {
     private SurfaceTextureListener mSTListener = new SurfaceTextureListener() {
         @Override
         public void onSurfaceTextureAvailable(final SurfaceTexture surface, final int width, final int height) {
+            Log.e(TAG, "onSurfaceTextureAvailable");
             mSurfaceTexture = surface;
             openVideo();
         }
@@ -541,7 +528,8 @@ public class CopyFensterVideoView extends TextureView implements FensterPlayer {
         @Override
         public void onSurfaceTextureSizeChanged(final SurfaceTexture surface, final int width, final int height) {
             boolean isValidState = (mTargetState == STATE_PLAYING);
-            boolean hasValidSize = videoSizeCalculator.currentSizeIs(width, height);
+            boolean hasValidSize = width > 0 && height > 0;
+            Log.e(TAG, "onSurfaceTextureSizeChanged videoSizeCalculator.currentWidthHeight= " + videoSizeCalculator.currentWidthHeight() + ";width=" + width + ",height=" + height);
             if (mMediaPlayer != null && isValidState && hasValidSize) {
                 if (mSeekWhenPrepared != 0) {
                     seekTo(mSeekWhenPrepared);
@@ -590,6 +578,7 @@ public class CopyFensterVideoView extends TextureView implements FensterPlayer {
 
     @Override
     public boolean onKeyDown(final int keyCode, final KeyEvent event) {
+        Log.e(TAG, "keyCode=" + keyCode + ",event=" + event);
         boolean isKeyCodeSupported = keyCode != KeyEvent.KEYCODE_BACK &&
                 keyCode != KeyEvent.KEYCODE_VOLUME_UP &&
                 keyCode != KeyEvent.KEYCODE_VOLUME_DOWN &&
@@ -746,14 +735,13 @@ public class CopyFensterVideoView extends TextureView implements FensterPlayer {
         return mAudioSession;
     }
 
-    /*private final OnInfoListener onInfoToPlayStateListener = new OnInfoListener() {
+    private final OnInfoListener onInfoToPlayStateListener = new OnInfoListener() {
 
         @Override
         public boolean onInfo(final MediaPlayer mp, final int what, final int extra) {
             if (noPlayStateListener()) {
                 return false;
             }
-
             if (MediaPlayer.MEDIA_INFO_VIDEO_RENDERING_START == what) {
                 onPlayStateListener.onFirstVideoFrameRendered();
                 onPlayStateListener.onPlay();
@@ -767,7 +755,7 @@ public class CopyFensterVideoView extends TextureView implements FensterPlayer {
 
             return false;
         }
-    };*/
+    };
 
     private boolean noPlayStateListener() {
         return !hasPlayStateListener();

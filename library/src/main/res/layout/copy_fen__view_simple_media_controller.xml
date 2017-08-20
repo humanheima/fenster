@@ -4,14 +4,14 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/media_controller_touch_root"
     android:layout_width="match_parent"
-    android:background="@android:color/transparent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@android:color/transparent">
 
     <RelativeLayout
-        android:background="@color/fen__default_bg"
         android:id="@+id/rl_controller_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@color/fen__default_bg"
         android:orientation="vertical">
 
         <LinearLayout
@@ -70,13 +70,20 @@
 
         </LinearLayout>
 
-        <ProgressBar
-            android:id="@+id/fen__media_controller_loading_view"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBottom="@id/media_controller_controls_root"
-            android:layout_alignTop="@id/media_controller_controls_root"
-            android:layout_centerInParent="true"/>
+        <RelativeLayout
+            android:id="@+id/rl_loading"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:color/black">
+
+            <ProgressBar
+                android:id="@+id/fen__media_controller_loading_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"/>
+
+        </RelativeLayout>
+
 
     </RelativeLayout>
 

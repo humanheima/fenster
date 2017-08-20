@@ -51,7 +51,7 @@ public final class CopySimpleMediaFensterPlayerController extends FrameLayout im
     private ImageButton mPauseButton;
     private ImageButton mNextButton;
     private ImageButton mPrevButton;
-    private ProgressBar loadingView;
+    private RelativeLayout loadingView;
     private int lastPlayedSeconds = -1;
     private boolean rootViewShowing = true;
     private RelativeLayout rlControllerView;
@@ -115,7 +115,7 @@ public final class CopySimpleMediaFensterPlayerController extends FrameLayout im
         bottomControlsRoot.setVisibility(INVISIBLE);
         controlsRoot = findViewById(R.id.media_controller_controls_root);
         controlsRoot.setVisibility(INVISIBLE);
-        loadingView = (ProgressBar) findViewById(R.id.fen__media_controller_loading_view);
+        loadingView = (RelativeLayout) findViewById(R.id.rl_loading);
     }
 
 
@@ -290,6 +290,28 @@ public final class CopySimpleMediaFensterPlayerController extends FrameLayout im
         return super.dispatchKeyEvent(event);
     }
 
+    public void setVideoPlayPause(boolean play) {
+        setVideoPlayPause(play, -1);
+    }
+
+    /**
+     * @param play true 代表播放 false代表暂停
+     */
+    public void setVideoPlayPause(boolean play, int seekToPosition) {
+        if (mFensterPlayer == null) {
+            return;
+        }
+        if (play) {
+            if (seekToPosition != -1) {
+                mFensterPlayer.seekTo(seekToPosition);
+            }
+            mFensterPlayer.start();
+        } else {
+            mFensterPlayer.pause();
+        }
+        updatePausePlay();
+    }
+
     private void updatePausePlay() {
         if (mPauseButton == null) {
             return;
@@ -333,9 +355,7 @@ public final class CopySimpleMediaFensterPlayerController extends FrameLayout im
     }
 
     private void hideLoadingView() {
-        //hide();
         loadingView.setVisibility(View.GONE);
-
         mLoading = false;
     }
 

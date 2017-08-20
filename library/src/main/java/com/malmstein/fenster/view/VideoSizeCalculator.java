@@ -88,7 +88,7 @@ public class VideoSizeCalculator {
         return dimens;
     }
 
-    protected Dimens measure(int widthMeasureSpec, int heightMeasureSpec,boolean matchWidth) {
+    protected Dimens measure(int widthMeasureSpec, int heightMeasureSpec, boolean matchWidth) {
         int width = View.getDefaultSize(mVideoWidth, widthMeasureSpec);
         int height = View.getDefaultSize(mVideoHeight, heightMeasureSpec);
         if (hasASizeYet()) {
@@ -151,6 +151,10 @@ public class VideoSizeCalculator {
 
     public boolean currentSizeIs(int w, int h) {
         return mVideoWidth == w && mVideoHeight == h;
+    }
+
+    public String currentWidthHeight() {
+        return "(mVideoWidth= " + mVideoWidth + "&& mVideoHeight= " + mVideoHeight + ")";
     }
 
     public void updateHolder(SurfaceHolder holder) {
