@@ -1,15 +1,15 @@
 package com.malmstein.fenster.demo;
 
-import android.app.Activity;
 import android.content.res.AssetFileDescriptor;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
 import com.malmstein.fenster.controller.FensterPlayerControllerVisibilityListener;
 import com.malmstein.fenster.controller.SimpleMediaFensterPlayerController;
 import com.malmstein.fenster.view.FensterVideoView;
 
-public class SimpleMediaPlayerActivity extends Activity implements FensterPlayerControllerVisibilityListener {
+public class SimpleMediaPlayerActivity extends AppCompatActivity implements FensterPlayerControllerVisibilityListener {
 
     public static final String KEY_LOCAL_FILE = BuildConfig.APPLICATION_ID + "KEY_LOCAL_FILE";
     private FensterVideoView textureView;

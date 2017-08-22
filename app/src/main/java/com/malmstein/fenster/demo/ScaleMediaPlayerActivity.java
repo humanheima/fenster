@@ -1,12 +1,12 @@
 package com.malmstein.fenster.demo;
 
-import android.app.Activity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 
 import com.malmstein.fenster.controller.SimpleMediaFensterPlayerController;
 import com.malmstein.fenster.view.FensterVideoView;
 
-public class ScaleMediaPlayerActivity extends Activity {
+public class ScaleMediaPlayerActivity extends AppCompatActivity {
 
     private FensterVideoView textureView;
     private SimpleMediaFensterPlayerController fullScreenMediaPlayerController;

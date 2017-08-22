@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+
+
     <string name="app_name">Fenster</string>
     <string name="description_demo_activity_controller">This demo shows two different MediaPlayer controllers. The Simple Media Controller demo displays a video in a TextureView with a customised Media Player Controller. The second demo extends de first one, allowing to use gestures in order to control the Media Player. </string>
     <string name="description_demo_activity_origin">Alternatively, you can also load a file from the Raw folder</string>

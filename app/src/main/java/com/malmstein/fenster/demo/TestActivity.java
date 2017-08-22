@@ -1,12 +1,12 @@
 package com.malmstein.fenster.demo;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.RelativeLayout;
 
@@ -14,7 +14,7 @@ import com.malmstein.fenster.controller.CopySimpleMediaFensterPlayerController;
 import com.malmstein.fenster.helper.ScreenResolution;
 import com.malmstein.fenster.view.CopyFensterVideoView;
 
-public class TestActivity extends Activity {
+public class TestActivity extends AppCompatActivity {
 
     private static final String TAG = "TestActivity";
 

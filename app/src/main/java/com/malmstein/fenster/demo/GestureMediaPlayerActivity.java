@@ -1,13 +1,13 @@
 package com.malmstein.fenster.demo;
 
-import android.app.Activity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
 import com.malmstein.fenster.controller.FensterPlayerControllerVisibilityListener;
 import com.malmstein.fenster.play.FensterVideoFragment;
 
-public class GestureMediaPlayerActivity extends Activity implements FensterPlayerControllerVisibilityListener {
+public class GestureMediaPlayerActivity extends AppCompatActivity implements FensterPlayerControllerVisibilityListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
