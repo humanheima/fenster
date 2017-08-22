@@ -66,7 +66,6 @@ public final class CopySimpleMediaFensterPlayerController extends FrameLayout im
     private LinearLayout llVolume;
     private VolumeProgressBar mVolume;
     private int lastPlayedSeconds = -1;
-    private boolean rootViewShowing = true;
     private RelativeLayout rlControllerView;
 
     //是否处于横屏状态下
@@ -477,7 +476,7 @@ public final class CopySimpleMediaFensterPlayerController extends FrameLayout im
                     pos = setProgress();
                     if (!mDragging && mFensterPlayer.isPlaying()) {
                         final Message message = obtainMessage(SHOW_PROGRESS);
-                        sendMessageDelayed(message, 1000 - (pos % 1000));
+                        sendMessageDelayed(message, 1000);
                     }
                     break;
             }
@@ -540,11 +539,11 @@ public final class CopySimpleMediaFensterPlayerController extends FrameLayout im
                 float deltaX = e2.getX() - e1.getX();
                 float deltaY = e2.getY() - e1.getY();
                 if (Math.abs(deltaX) > Math.abs(deltaY)) {
-                    if (Math.abs(deltaX) > TOUCH_SLOP) {
+                    if (Math.abs(deltaX) > TOUCH_SLOP && (Math.abs(deltaX) - Math.abs(deltaY) > 100)) {
                         if (deltaX > 0) {
-                            Log.e(TAG, "Slide right");
+                            swipeRight(Math.abs(deltaX));
                         } else {
-                            Log.e(TAG, "Slide left");
+                            swipeLeft(Math.abs(deltaX));
                         }
                     }
                 } else {
@@ -576,6 +575,45 @@ public final class CopySimpleMediaFensterPlayerController extends FrameLayout im
             return true;
         }
     });
+
+    /**
+     * @param deltaX 向右水平滑动的距离
+     */
+    private void swipeRight(float deltaX) {
+        int width = ScreenResolution.getResolution(getContext()).first;
+        float percent = deltaX / (float) width;
+        Log.e(TAG, "swipeRight percent=" + percent);
+        long duration = mFensterPlayer.getDuration();
+        long currentPosition = mFensterPlayer.getCurrentPosition();
+        long newPosition = (long) (currentPosition + ((duration - currentPosition) * percent));
+        if (newPosition > duration) {
+            newPosition = duration;
+        }
+        mFensterPlayer.seekTo((int) newPosition);
+        mHandler.removeMessages(SHOW_PROGRESS);
+        mHandler.sendEmptyMessage(SHOW_PROGRESS);
+        if (mCurrentTime != null) {
+            mCurrentTime.setText(stringForTime((int) newPosition));
+        }
+    }
+
+    private void swipeLeft(float deltaX) {
+        int width = ScreenResolution.getResolution(getContext()).first;
+        float percent = deltaX / (float) width;
+        Log.e(TAG, "swipeLeft percent=" + percent);
+        long duration = mFensterPlayer.getDuration();
+        long currentPosition = mFensterPlayer.getCurrentPosition();
+        long newPosition = (long) (currentPosition - ((duration - currentPosition) * percent));
+        if (newPosition < 0) {
+            newPosition = 0;
+        }
+        mFensterPlayer.seekTo((int) newPosition);
+        mHandler.removeMessages(SHOW_PROGRESS);
+        mHandler.sendEmptyMessage(SHOW_PROGRESS);
+        if (mCurrentTime != null) {
+            mCurrentTime.setText(stringForTime((int) newPosition));
+        }
+    }
 
     private void setVolume(float delta) {
         int x = (int) delta;
