@@ -72,6 +72,22 @@ public class BrightnessSeekBar extends SeekBar {
         BrightnessHelper.setBrightness(getContext(), brightness);
     }
 
+    public void setBrightness(boolean up) {
+        int brightness = BrightnessHelper.getBrightness(getContext());
+        if (up) {
+            brightness += 1;
+        } else {
+            brightness -= 1;
+        }
+        if (brightness < MIN_BRIGHTNESS) {
+            brightness = MIN_BRIGHTNESS;
+        } else if (brightness > MAX_BRIGHTNESS) {
+            brightness = MAX_BRIGHTNESS;
+        }
+        BrightnessHelper.setBrightness(getContext(), brightness);
+        setProgress(brightness);
+    }
+
     public void manuallyUpdate(int update) {
         brightnessSeekListener.onProgressChanged(this, update, true);
     }

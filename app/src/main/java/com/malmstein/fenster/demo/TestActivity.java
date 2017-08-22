@@ -92,6 +92,7 @@ public class TestActivity extends Activity {
                 RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) rlVideoView.getLayoutParams();
                 params.height = portraitWidth / 16 * 9;
                 rlVideoView.setLayoutParams(params);
+                fullScreenMediaPlayerController.setLandscape(false);
             }
         });
     }
@@ -104,6 +105,7 @@ public class TestActivity extends Activity {
                 params.width = RelativeLayout.LayoutParams.MATCH_PARENT;
                 params.height = RelativeLayout.LayoutParams.MATCH_PARENT;
                 rlVideoView.setLayoutParams(params);
+                fullScreenMediaPlayerController.setLandscape(true);
             }
         });
     }

@@ -5,20 +5,26 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.malmstein.fenster.R;
+import com.malmstein.fenster.helper.ScreenResolution;
 import com.malmstein.fenster.play.FensterPlayer;
 import com.malmstein.fenster.play.FensterVideoStateListener;
+import com.malmstein.fenster.view.BrightnessProgressBar;
+import com.malmstein.fenster.view.VolumeProgressBar;
 
 import java.util.Formatter;
 import java.util.Locale;
@@ -33,11 +39,14 @@ public final class CopySimpleMediaFensterPlayerController extends FrameLayout im
     private static final int FADE_OUT = 1;
     private static final int SHOW_PROGRESS = 2;
 
+    private ViewConfiguration viewConfiguration;
+    private int TOUCH_SLOP;
+
+
     private FensterPlayerControllerVisibilityListener visibilityListener;
     private FensterPlayer mFensterPlayer;
     private boolean mShowing;
     private boolean mDragging;
-
     private boolean mLoading;
 
     private StringBuilder mFormatBuilder;
@@ -52,9 +61,26 @@ public final class CopySimpleMediaFensterPlayerController extends FrameLayout im
     private ImageButton mNextButton;
     private ImageButton mPrevButton;
     private RelativeLayout loadingView;
+    private LinearLayout llBrightness;
+    private BrightnessProgressBar mBrightness;
+    private LinearLayout llVolume;
+    private VolumeProgressBar mVolume;
     private int lastPlayedSeconds = -1;
     private boolean rootViewShowing = true;
     private RelativeLayout rlControllerView;
+
+    //是否处于横屏状态下
+    private boolean landscape;
+    //横屏的时候是否处于屏幕的左半部分，在左半部分上下滑动调节亮度，在右半部分上下滑动调节音量
+    private boolean inLeftArea;
+
+    public void setLandscape(boolean landscape) {
+        this.landscape = landscape;
+    }
+
+    public boolean isLandscape() {
+        return landscape;
+    }
 
     public CopySimpleMediaFensterPlayerController(final Context context) {
         this(context, null);
@@ -81,18 +107,10 @@ public final class CopySimpleMediaFensterPlayerController extends FrameLayout im
     }
 
     private void initControllerView() {
+        viewConfiguration = ViewConfiguration.get(getContext());
+        TOUCH_SLOP = viewConfiguration.getScaledTouchSlop();
         LayoutInflater.from(getContext()).inflate(R.layout.copy_fen__view_simple_media_controller, this);
         rlControllerView = (RelativeLayout) findViewById(R.id.rl_controller_view);
-        setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mShowing) {
-                    hide();
-                } else {
-                    show();
-                }
-            }
-        });
         mPauseButton = (ImageButton) findViewById(R.id.fen__media_controller_pause);
         mPauseButton.requestFocus();
         mPauseButton.setOnClickListener(mPauseListener);
@@ -116,8 +134,14 @@ public final class CopySimpleMediaFensterPlayerController extends FrameLayout im
         controlsRoot = findViewById(R.id.media_controller_controls_root);
         controlsRoot.setVisibility(INVISIBLE);
         loadingView = (RelativeLayout) findViewById(R.id.rl_loading);
-    }
 
+        llBrightness = (LinearLayout) findViewById(R.id.ll_brightness);
+        mBrightness = (BrightnessProgressBar) findViewById(R.id.seek_bar_brightness);
+
+        llVolume = (LinearLayout) findViewById(R.id.ll_volume);
+        mVolume = (VolumeProgressBar) findViewById(R.id.seek_bar_volume);
+
+    }
 
     /**
      * Show the controller on screen. It will go away
@@ -150,6 +174,12 @@ public final class CopySimpleMediaFensterPlayerController extends FrameLayout im
                 if (rlControllerView.getVisibility() == INVISIBLE) {
                     rlControllerView.setVisibility(VISIBLE);
                 }
+                if (llBrightness.getVisibility() == VISIBLE) {
+                    llBrightness.setVisibility(GONE);
+                }
+                if (llVolume.getVisibility() == VISIBLE) {
+                    llVolume.setVisibility(GONE);
+                }
             }
             // cause the progress bar to be updated even if mShowing
             // was already true.  This happens, for example, if we're
@@ -165,6 +195,12 @@ public final class CopySimpleMediaFensterPlayerController extends FrameLayout im
             //播放结束的时候显示conroller
             mHandler.removeMessages(SHOW_PROGRESS);
             rlControllerView.setVisibility(VISIBLE);
+            if (llBrightness.getVisibility() == VISIBLE) {
+                llBrightness.setVisibility(GONE);
+            }
+            if (llVolume.getVisibility() == VISIBLE) {
+                llVolume.setVisibility(GONE);
+            }
         }
     }
 
@@ -240,6 +276,11 @@ public final class CopySimpleMediaFensterPlayerController extends FrameLayout im
     public boolean onTrackballEvent(final MotionEvent ev) {
         show(DEFAULT_TIMEOUT);
         return false;
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        return gestureDetector.onTouchEvent(event);
     }
 
     @Override
@@ -475,5 +516,77 @@ public final class CopySimpleMediaFensterPlayerController extends FrameLayout im
             show(DEFAULT_TIMEOUT);
         }
     };
+
+    private GestureDetector gestureDetector = new GestureDetector(getContext(), new GestureDetector.SimpleOnGestureListener() {
+
+        @Override
+        public boolean onDown(MotionEvent e) {
+            show(2000);
+            if (landscape) {
+                int width = ScreenResolution.getResolution(getContext()).first;
+                if (e.getRawX() < width / 2) {
+                    inLeftArea = true;
+                } else {
+                    inLeftArea = false;
+                }
+            }
+            return true;
+        }
+
+        @Override
+        public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+            Log.e(TAG, "gestureDetector onScroll: ");
+            if (landscape) {
+                float deltaX = e2.getX() - e1.getX();
+                float deltaY = e2.getY() - e1.getY();
+                if (Math.abs(deltaX) > Math.abs(deltaY)) {
+                    if (Math.abs(deltaX) > TOUCH_SLOP) {
+                        if (deltaX > 0) {
+                            Log.e(TAG, "Slide right");
+                        } else {
+                            Log.e(TAG, "Slide left");
+                        }
+                    }
+                } else {
+                    if (Math.abs(deltaY) > TOUCH_SLOP && (Math.abs(deltaY) - Math.abs(deltaX) > 100)) {
+                        if (inLeftArea) {
+                            //调节亮度
+                            llBrightness.setVisibility(VISIBLE);
+                            if (deltaY > 0) {
+                                Log.e(TAG, "Slide down");
+                                mBrightness.setBrightness(false);
+                            } else {
+                                Log.e(TAG, "Slide up");
+                                mBrightness.setBrightness(true);
+                            }
+                        } else {
+                            llVolume.setVisibility(VISIBLE);
+                            //调节音量
+                            setVolume(-deltaY);
+                        }
+                    }
+                }
+            }
+            return true;
+        }
+
+        @Override
+        public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+            Log.e(TAG, "gestureDetector onFling: ");
+            return true;
+        }
+    });
+
+    private void setVolume(float delta) {
+        int x = (int) delta;
+        float progress = mVolume.getProgress();
+        if (x < 0) {
+            //减小音量
+            progress = progress - 1;
+        } else {
+            progress = progress + 1;
+        }
+        mVolume.setVolume((int) progress);
+    }
 
 }
