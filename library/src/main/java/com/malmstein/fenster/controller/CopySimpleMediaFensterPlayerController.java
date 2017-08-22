@@ -12,7 +12,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.widget.FrameLayout;
-import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
@@ -52,14 +52,12 @@ public final class CopySimpleMediaFensterPlayerController extends FrameLayout im
     private StringBuilder mFormatBuilder;
     private Formatter mFormatter;
     private View bottomControlsRoot;
-    private View controlsRoot;
     private ProgressBar mProgress;
     private TextView mEndTime;
     private TextView mCurrentTime;
 
-    private ImageButton mPauseButton;
-    private ImageButton mNextButton;
-    private ImageButton mPrevButton;
+    private ImageView imgBack;
+    private ImageView imgPause;
     private RelativeLayout loadingView;
     private LinearLayout llBrightness;
     private BrightnessProgressBar mBrightness;
@@ -72,6 +70,12 @@ public final class CopySimpleMediaFensterPlayerController extends FrameLayout im
     private boolean landscape;
     //横屏的时候是否处于屏幕的左半部分，在左半部分上下滑动调节亮度，在右半部分上下滑动调节音量
     private boolean inLeftArea;
+
+    private BackPressedListener backPressedListener;
+
+    public void setBackPressedListener(BackPressedListener backPressedListener) {
+        this.backPressedListener = backPressedListener;
+    }
 
     public void setLandscape(boolean landscape) {
         this.landscape = landscape;
@@ -110,14 +114,12 @@ public final class CopySimpleMediaFensterPlayerController extends FrameLayout im
         TOUCH_SLOP = viewConfiguration.getScaledTouchSlop();
         LayoutInflater.from(getContext()).inflate(R.layout.copy_fen__view_simple_media_controller, this);
         rlControllerView = (RelativeLayout) findViewById(R.id.rl_controller_view);
-        mPauseButton = (ImageButton) findViewById(R.id.fen__media_controller_pause);
-        mPauseButton.requestFocus();
-        mPauseButton.setOnClickListener(mPauseListener);
+        imgPause = (ImageView) findViewById(R.id.fen__media_controller_pause);
+        imgPause.requestFocus();
+        imgPause.setOnClickListener(mPauseListener);
+        imgBack= (ImageView) findViewById(R.id.fen_img_back);
+        imgBack.setOnClickListener(mBckListener);
 
-        mNextButton = (ImageButton) findViewById(R.id.fen__media_controller_next);
-        mNextButton.setOnClickListener(mNextListener);
-        mPrevButton = (ImageButton) findViewById(R.id.fen__media_controller_previous);
-        mPrevButton.setOnClickListener(mPreviousListener);
         mProgress = (SeekBar) findViewById(R.id.fen__media_controller_progress);
         SeekBar seeker = (SeekBar) mProgress;
         seeker.setOnSeekBarChangeListener(mSeekListener);
@@ -130,8 +132,6 @@ public final class CopySimpleMediaFensterPlayerController extends FrameLayout im
 
         bottomControlsRoot = findViewById(R.id.fen__media_controller_bottom_area);
         bottomControlsRoot.setVisibility(INVISIBLE);
-        controlsRoot = findViewById(R.id.media_controller_controls_root);
-        controlsRoot.setVisibility(INVISIBLE);
         loadingView = (RelativeLayout) findViewById(R.id.rl_loading);
 
         llBrightness = (LinearLayout) findViewById(R.id.ll_brightness);
@@ -167,8 +167,8 @@ public final class CopySimpleMediaFensterPlayerController extends FrameLayout im
             if (!mShowing) {
                 mShowing = true;
                 setProgress();
-                if (mPauseButton != null) {
-                    mPauseButton.requestFocus();
+                if (imgPause != null) {
+                    imgPause.requestFocus();
                 }
                 if (rlControllerView.getVisibility() == INVISIBLE) {
                     rlControllerView.setVisibility(VISIBLE);
@@ -293,8 +293,8 @@ public final class CopySimpleMediaFensterPlayerController extends FrameLayout im
             if (uniqueDown) {
                 doPauseResume();
                 show(DEFAULT_TIMEOUT);
-                if (mPauseButton != null) {
-                    mPauseButton.requestFocus();
+                if (imgPause != null) {
+                    imgPause.requestFocus();
                 }
             }
             return true;
@@ -353,13 +353,13 @@ public final class CopySimpleMediaFensterPlayerController extends FrameLayout im
     }
 
     private void updatePausePlay() {
-        if (mPauseButton == null) {
+        if (imgPause == null) {
             return;
         }
         if (mFensterPlayer.isPlaying()) {
-            mPauseButton.setImageResource(android.R.drawable.ic_media_pause);
+            imgPause.setImageResource(R.drawable.fen_ic_pause_white);
         } else {
-            mPauseButton.setImageResource(android.R.drawable.ic_media_play);
+            imgPause.setImageResource(R.drawable.fen_ic_play_white);
         }
     }
 
@@ -376,7 +376,6 @@ public final class CopySimpleMediaFensterPlayerController extends FrameLayout im
     public void onFirstVideoFrameRendered() {
         Log.e(TAG, "onFirstVideoFrameRendered");
         bottomControlsRoot.setVisibility(VISIBLE);
-        controlsRoot.setVisibility(VISIBLE);
     }
 
     @Override
@@ -490,29 +489,12 @@ public final class CopySimpleMediaFensterPlayerController extends FrameLayout im
         }
     };
 
-    private final OnClickListener mPreviousListener = new OnClickListener() {
+    private final OnClickListener mBckListener = new OnClickListener() {
         @Override
         public void onClick(View v) {
-            int pos = mFensterPlayer.getCurrentPosition();
-            pos -= 5000; // milliseconds
-            if (pos >= 0) {
-                mFensterPlayer.seekTo(pos);
-                setProgress();
+            if (backPressedListener != null) {
+                backPressedListener.backPressed();
             }
-            show(DEFAULT_TIMEOUT);
-        }
-    };
-
-    private final OnClickListener mNextListener = new OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            int pos = mFensterPlayer.getCurrentPosition();
-            pos += 15000; // milliseconds
-            if (pos <= mFensterPlayer.getDuration()) {
-                mFensterPlayer.seekTo(pos);
-                setProgress();
-            }
-            show(DEFAULT_TIMEOUT);
         }
     };
 
@@ -627,4 +609,7 @@ public final class CopySimpleMediaFensterPlayerController extends FrameLayout im
         mVolume.setVolume((int) progress);
     }
 
+    public interface BackPressedListener {
+        void backPressed();
+    }
 }

@@ -1,154 +1,152 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<FrameLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/media_controller_touch_root"
+    android:id="@+id/rl_controller_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/transparent">
 
     <RelativeLayout
-        android:id="@+id/rl_controller_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="40dp"
         android:background="@color/fen__default_bg">
 
-        <RelativeLayout
-            android:id="@+id/fen__media_controller_bottom_area"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_marginBottom="12dp">
-
-            <LinearLayout
-                android:id="@+id/media_controller_controls_root"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:gravity="center"
-                android:orientation="horizontal">
-
-                <ImageButton
-                    android:id="@+id/fen__media_controller_previous"
-                    style="@style/MediaButton.Previous"
-                    android:visibility="gone"/>
-
-                <ImageButton
-                    android:id="@+id/fen__media_controller_pause"
-                    style="@style/MediaButton.Play"/>
-
-                <ImageButton
-                    android:id="@+id/fen__media_controller_next"
-                    style="@style/MediaButton.Next"
-                    android:visibility="gone"/>
-
-            </LinearLayout>
-
-            <SeekBar
-                android:id="@+id/fen__media_controller_progress"
-                android:layout_width="match_parent"
-                android:layout_height="32dp"
-                android:layout_centerVertical="true"
-                android:layout_toLeftOf="@+id/fen__media_controller_time_current"
-                android:layout_toRightOf="@+id/media_controller_controls_root"/>
-
-            <TextView
-                android:id="@+id/fen__media_controller_time_current"
-                style="@style/MediaText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_toLeftOf="@+id/fen__media_controller_time_split"/>
-
-            <TextView
-                android:id="@+id/fen__media_controller_time_split"
-                style="@style/MediaText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_toLeftOf="@+id/fen__media_controller_time"
-                android:text="/"/>
-
-            <TextView
-                android:id="@+id/fen__media_controller_time"
-                style="@style/MediaText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_centerVertical="true"
-                android:layout_marginRight="16dp"/>
-
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:id="@+id/rl_loading"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@android:color/black"
-            android:visibility="visible">
-
-            <ProgressBar
-                android:id="@+id/fen__media_controller_loading_view"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"/>
-
-        </RelativeLayout>
-
-        <RelativeLayout
+        <ImageView
+            android:id="@+id/fen_img_back"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:background="@android:color/black">
-
-            <LinearLayout
-                android:id="@+id/ll_brightness"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="20dp"
-                android:visibility="gone">
-
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:src="@drawable/fen__ic_action_bulb"/>
-
-                <com.malmstein.fenster.view.BrightnessProgressBar
-                    android:id="@+id/seek_bar_brightness"
-                    style="@style/Fen_Style_Brightness_Progress_Bar"
-                    android:layout_width="100dp"
-                    android:layout_height="4dp"
-                    android:layout_marginTop="16dp"/>
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/ll_volume"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="20dp"
-                android:visibility="gone">
-
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:src="@drawable/fen__ic_action_music_2"/>
-
-                <com.malmstein.fenster.view.VolumeProgressBar
-                    android:id="@+id/seek_bar_volume"
-                    style="@style/Fen_Style_Brightness_Progress_Bar"
-                    android:layout_width="100dp"
-                    android:layout_height="4dp"
-                    android:layout_marginTop="16dp"/>
-
-            </LinearLayout>
-
-        </RelativeLayout>
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="8dp"
+            android:src="@drawable/fen_ic_back_white"/>
 
     </RelativeLayout>
 
-</FrameLayout>
+    <RelativeLayout
+        android:id="@+id/fen__media_controller_bottom_area"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="12dp"
+        android:background="@color/fen__default_bg">
+
+        <ImageView
+            android:id="@+id/fen__media_controller_pause"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="8dp"
+            android:src="@drawable/fen_ic_play_white"/>
+
+        <SeekBar
+            android:id="@+id/fen__media_controller_progress"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toLeftOf="@+id/fen__media_controller_time_current"
+            android:layout_toRightOf="@+id/fen__media_controller_pause"
+            android:maxHeight="2dp"
+            android:minHeight="2dp"
+            android:paddingLeft="12dp"
+            android:paddingRight="12dp"
+            android:progressDrawable="@drawable/fen_progress_drawable"
+            android:thumb="@drawable/fen_seek_bar_thumb"/>
+
+        <TextView
+            android:id="@+id/fen__media_controller_time_current"
+            style="@style/MediaText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toLeftOf="@+id/fen__media_controller_time_split"/>
+
+        <TextView
+            android:id="@+id/fen__media_controller_time_split"
+            style="@style/MediaText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toLeftOf="@+id/fen__media_controller_time"
+            android:text="/"/>
+
+        <TextView
+            android:id="@+id/fen__media_controller_time"
+            style="@style/MediaText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="16dp"/>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/rl_loading"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/black"
+        android:visibility="visible">
+
+        <ProgressBar
+            android:id="@+id/fen__media_controller_loading_view"
+            style="@style/fen_style_loading"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"/>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:background="@android:color/black">
+
+        <LinearLayout
+            android:id="@+id/ll_brightness"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="20dp"
+            android:visibility="gone">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:src="@drawable/fen__ic_action_bulb"/>
+
+            <com.malmstein.fenster.view.BrightnessProgressBar
+                android:id="@+id/seek_bar_brightness"
+                style="@style/Fen_Style_Brightness_Progress_Bar"
+                android:layout_width="100dp"
+                android:layout_height="4dp"
+                android:layout_marginTop="16dp"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_volume"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="20dp"
+            android:visibility="gone">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:src="@drawable/fen_ic_volume_white"/>
+
+            <com.malmstein.fenster.view.VolumeProgressBar
+                android:id="@+id/seek_bar_volume"
+                style="@style/Fen_Style_Brightness_Progress_Bar"
+                android:layout_width="100dp"
+                android:layout_height="4dp"
+                android:layout_marginTop="16dp"/>
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
+</RelativeLayout>

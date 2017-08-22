@@ -42,6 +42,12 @@ public class TestActivity extends AppCompatActivity {
         rlVideoView = (RelativeLayout) findViewById(R.id.rl_video_view);
         textureView = (CopyFensterVideoView) findViewById(R.id.play_video_texture);
         fullScreenMediaPlayerController = (CopySimpleMediaFensterPlayerController) findViewById(R.id.play_video_controller);
+        fullScreenMediaPlayerController.setBackPressedListener(new CopySimpleMediaFensterPlayerController.BackPressedListener() {
+            @Override
+            public void backPressed() {
+                onBackPressed();
+            }
+        });
         setPortrait();
     }
 

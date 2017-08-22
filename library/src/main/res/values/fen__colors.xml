@@ -2,5 +2,6 @@
 <resources>
 
   <color name="fen__default_bg">#aa000000</color>
+  <color name="fen_progress_bar_color">#33B5E5</color>
 
 </resources>
